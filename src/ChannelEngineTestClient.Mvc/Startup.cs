@@ -51,6 +51,7 @@ namespace ChannelEngineTestClient.Mvc
                     httpClientFactory,
                     loggerFactory.CreateLogger<ProductsService>());
             });
+            services.AddTransient<ITopProductsCalculator, TopProductsCalculator>();
 
             services.AddControllersWithViews();
         }

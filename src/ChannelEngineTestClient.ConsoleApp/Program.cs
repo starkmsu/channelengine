@@ -48,13 +48,16 @@ namespace ChannelEngineTestClient.ConsoleApp
                     httpClientFactory,
                     loggerFactory.CreateLogger<ProductsService>());
             });
+            serviceCollection.AddTransient<ITopProductsCalculator, TopProductsCalculator>();
 
             var sp = serviceCollection.BuildServiceProvider();
 
             var ordersService = sp.GetRequiredService<IOrdersService>();
             var productsService = sp.GetRequiredService<IProductsService>();
+            var topProductsCalculator = sp.GetRequiredService<ITopProductsCalculator>();
 
-            var topOrders = GetTopOrdersAsync(ordersService, 5).GetAwaiter().GetResult();
+            var orderLines = GetOrderLinesAsync(ordersService).GetAwaiter().GetResult();
+            var topOrders = topProductsCalculator.CalculateTopProducts(orderLines, 5);
             ShowTopOrders(topOrders);
             if (topOrders.Count > 0)
                 UpdateStockAsync(productsService, topOrders.First().Item4, 25).GetAwaiter().GetResult();
@@ -63,7 +66,7 @@ namespace ChannelEngineTestClient.ConsoleApp
             Console.ReadLine();
         }
 
-        private static async Task<List<(int, string, string, string)>> GetTopOrdersAsync(IOrdersService ordersService, int topCount)
+        private static async Task<List<OrderLine>> GetOrderLinesAsync(IOrdersService ordersService)
         {
             Console.WriteLine("Fetching InProgress orders...");
 
@@ -95,16 +98,7 @@ namespace ChannelEngineTestClient.ConsoleApp
                 }
             }
 
-            var groups = orderLines.GroupBy(i => i.MerchantProductNo);
-            var result = new List<(int, string, string, string)>();
-            foreach (var group in groups)
-            {
-                var sum = group.Sum(i => i.Quantity);
-                var first = group.First();
-                result.Add((sum, first.Description, first.Gtin, first.MerchantProductNo));
-            }
-
-            return result.OrderByDescending(i => i.Item1).Take(topCount).ToList();
+            return orderLines;
         }
 
         private static void ShowTopOrders(List<(int, string, string, string)> topOrders)

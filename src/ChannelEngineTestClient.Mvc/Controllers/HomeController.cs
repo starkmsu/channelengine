@@ -15,21 +15,25 @@ namespace ChannelEngineTestClient.Mvc.Controllers
     {
         private readonly IOrdersService _ordersService;
         private readonly IProductsService _productsService;
+        private readonly ITopProductsCalculator _topProductsCalculator;
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(
             IOrdersService ordersService,
             IProductsService productsService,
+            ITopProductsCalculator topProductsCalculator,
             ILogger<HomeController> logger)
         {
             _ordersService = ordersService;
             _productsService = productsService;
+            _topProductsCalculator = topProductsCalculator;
             _logger = logger;
         }
 
         public async Task<IActionResult> Index()
         {
-            var topOrders = await GetTopOrdersAsync(5);
+            var orderLines = await GetOrderLinesAsync();
+            var topOrders = _topProductsCalculator.CalculateTopProducts(orderLines, 5);
 
             var model = new IndexModel
             {
@@ -52,7 +56,7 @@ namespace ChannelEngineTestClient.Mvc.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private async Task<List<(int, string, string, string)>> GetTopOrdersAsync(int topCount)
+        private async Task<List<OrderLine>> GetOrderLinesAsync()
         {
             _logger.LogInformation("Fetching InProgress orders...");
 
@@ -84,16 +88,7 @@ namespace ChannelEngineTestClient.Mvc.Controllers
                 }
             }
 
-            var groups = orderLines.GroupBy(i => i.MerchantProductNo);
-            var result = new List<(int, string, string, string)>();
-            foreach (var group in groups)
-            {
-                var sum = group.Sum(i => i.Quantity);
-                var first = group.First();
-                result.Add((sum, first.Description, first.Gtin, first.MerchantProductNo));
-            }
-
-            return result.OrderByDescending(i => i.Item1).Take(topCount).ToList();
+            return orderLines;
         }
 
         private  List<ProductData> GetProductData(List<(int, string, string, string)> topOrders)
