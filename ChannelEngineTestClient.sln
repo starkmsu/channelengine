@@ -1,0 +1,54 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32126.315
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChannelEngineTestClient.Mvc", "src\ChannelEngineTestClient.Mvc\ChannelEngineTestClient.Mvc.csproj", "{6ACA432E-EC01-4CD0-A6E8-EAE803D3F49D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChannelEngineTestClient.Domain", "src\ChannelEngineTestClient.Domain\ChannelEngineTestClient.Domain.csproj", "{6E34493C-936B-4956-9A07-1CC67ECCB060}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChannelEngineTestClient.Services", "src\ChannelEngineTestClient.Services\ChannelEngineTestClient.Services.csproj", "{718C1388-AEFC-435B-84A2-4A34651422E5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{8D99B9FE-9D10-4D3B-BD77-913C4C7C60E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChannelEngineTestClient.Tests", "tests\ChannelEngineTestClient.Tests\ChannelEngineTestClient.Tests.csproj", "{57BE94AD-3D39-42B3-850E-AAF7F5E9643D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChannelEngineTestClient.ConsoleApp", "src\ChannelEngineTestClient.ConsoleApp\ChannelEngineTestClient.ConsoleApp.csproj", "{A47048EC-D17C-40F2-B52B-E39687FBB68A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6ACA432E-EC01-4CD0-A6E8-EAE803D3F49D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6ACA432E-EC01-4CD0-A6E8-EAE803D3F49D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6ACA432E-EC01-4CD0-A6E8-EAE803D3F49D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6ACA432E-EC01-4CD0-A6E8-EAE803D3F49D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E34493C-936B-4956-9A07-1CC67ECCB060}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E34493C-936B-4956-9A07-1CC67ECCB060}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E34493C-936B-4956-9A07-1CC67ECCB060}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E34493C-936B-4956-9A07-1CC67ECCB060}.Release|Any CPU.Build.0 = Release|Any CPU
+		{718C1388-AEFC-435B-84A2-4A34651422E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{718C1388-AEFC-435B-84A2-4A34651422E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{718C1388-AEFC-435B-84A2-4A34651422E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{718C1388-AEFC-435B-84A2-4A34651422E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57BE94AD-3D39-42B3-850E-AAF7F5E9643D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57BE94AD-3D39-42B3-850E-AAF7F5E9643D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57BE94AD-3D39-42B3-850E-AAF7F5E9643D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57BE94AD-3D39-42B3-850E-AAF7F5E9643D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A47048EC-D17C-40F2-B52B-E39687FBB68A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A47048EC-D17C-40F2-B52B-E39687FBB68A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A47048EC-D17C-40F2-B52B-E39687FBB68A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A47048EC-D17C-40F2-B52B-E39687FBB68A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{57BE94AD-3D39-42B3-850E-AAF7F5E9643D} = {8D99B9FE-9D10-4D3B-BD77-913C4C7C60E6}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D8343E6F-FF03-4D53-BD69-01D5686EE9D8}
+	EndGlobalSection
+EndGlobal
