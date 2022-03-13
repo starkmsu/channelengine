@@ -1,11 +1,15 @@
+using ChannelEngineTestClient.Domain.Services;
+using ChannelEngineTestClient.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace ChannelEngineTestClient.Mvc
@@ -24,6 +28,30 @@ namespace ChannelEngineTestClient.Mvc
         {
             services.AddHttpClient();
 
+            var apiBaseUrl = Configuration["ApiBaseUrl"];
+            var apiKey = Configuration["ApiKey"];
+
+            services.AddTransient<IOrdersService>(sp =>
+            {
+                var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
+                var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
+                return new OrdersService(
+                    apiBaseUrl,
+                    apiKey,
+                    httpClientFactory,
+                    loggerFactory.CreateLogger<OrdersService>());
+            });
+            services.AddTransient<IProductsService>(sp =>
+            {
+                var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
+                var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
+                return new ProductsService(
+                    apiBaseUrl,
+                    apiKey,
+                    httpClientFactory,
+                    loggerFactory.CreateLogger<ProductsService>());
+            });
+
             services.AddControllersWithViews();
         }
 
@@ -41,8 +69,6 @@ namespace ChannelEngineTestClient.Mvc
             app.UseStaticFiles();
 
             app.UseRouting();
-
-            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

@@ -15,7 +15,8 @@ namespace ChannelEngineTestClient.ConsoleApp
     {
         static void Main(string[] args)
         {
-            var baseUrl = "https://api-dev.channelengine.net/api";
+            // TODO - move these 2 to appsettings.json
+            var apiBaseUrl = "https://api-dev.channelengine.net/api";
             var apiKey = "541b989ef78ccb1bad630ea5b85c6ebff9ca3322";
 
             var serviceCollection = new ServiceCollection();
@@ -32,7 +33,7 @@ namespace ChannelEngineTestClient.ConsoleApp
                 var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
                 var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
                 return new OrdersService(
-                    baseUrl,
+                    apiBaseUrl,
                     apiKey,
                     httpClientFactory,
                     loggerFactory.CreateLogger<OrdersService>());
@@ -42,7 +43,7 @@ namespace ChannelEngineTestClient.ConsoleApp
                 var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
                 var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
                 return new ProductsService(
-                    baseUrl,
+                    apiBaseUrl,
                     apiKey,
                     httpClientFactory,
                     loggerFactory.CreateLogger<ProductsService>());
@@ -53,16 +54,16 @@ namespace ChannelEngineTestClient.ConsoleApp
             var ordersService = sp.GetRequiredService<IOrdersService>();
             var productsService = sp.GetRequiredService<IProductsService>();
 
-            var topOrders = GetTopOrdersAsync(ordersService).GetAwaiter().GetResult();
-            ShowTopOrdersAsync(productsService, topOrders).GetAwaiter().GetResult();
+            var topOrders = GetTopOrdersAsync(ordersService, 5).GetAwaiter().GetResult();
+            ShowTopOrders(topOrders);
             if (topOrders.Count > 0)
-                UpdateStockAsync(productsService, topOrders.First().MerchantProductNo).GetAwaiter().GetResult();
+                UpdateStockAsync(productsService, topOrders.First().Item4, 25).GetAwaiter().GetResult();
 
             Console.WriteLine("Press Enter to exit...");
             Console.ReadLine();
         }
 
-        private static async Task<List<OrderLine>> GetTopOrdersAsync(IOrdersService ordersService)
+        private static async Task<List<(int, string, string, string)>> GetTopOrdersAsync(IOrdersService ordersService, int topCount)
         {
             Console.WriteLine("Fetching InProgress orders...");
 
@@ -75,7 +76,7 @@ namespace ChannelEngineTestClient.ConsoleApp
             {
                 try
                 {
-                    var ordersPage = ordersService.FetchOrdersAsync(pageNumber, Domain.Enums.OrderStatus.IN_PROGRESS).GetAwaiter().GetResult();
+                    var ordersPage = await ordersService.FetchOrdersAsync(pageNumber, Domain.Enums.OrderStatus.IN_PROGRESS);
 
                     Console.WriteLine($"Fetched {ordersPage.Content.Length} InProgress orders.");
 
@@ -94,25 +95,30 @@ namespace ChannelEngineTestClient.ConsoleApp
                 }
             }
 
-            var topCount = 5;
-            var topOrders = orderLines.OrderByDescending(i => i.Quantity).Take(topCount).ToList();
+            var groups = orderLines.GroupBy(i => i.MerchantProductNo);
+            var result = new List<(int, string, string, string)>();
+            foreach (var group in groups)
+            {
+                var sum = group.Sum(i => i.Quantity);
+                var first = group.First();
+                result.Add((sum, first.Description, first.Gtin, first.MerchantProductNo));
+            }
 
-            return topOrders;
+            return result.OrderByDescending(i => i.Item1).Take(topCount).ToList();
         }
 
-        private static async Task ShowTopOrdersAsync(IProductsService productsService, List<OrderLine> topOrders)
+        private static void ShowTopOrders(List<(int, string, string, string)> topOrders)
         {
+            Console.WriteLine();
             Console.WriteLine($"Top {topOrders.Count} orders:");
-            foreach (var orderLine in topOrders)
+
+            foreach (var (sold, name, gtin, _) in topOrders)
             {
                 try
                 {
-                    var product = productsService.GetProductAsync(orderLine.MerchantProductNo).GetAwaiter().GetResult();
-
-                    Console.WriteLine($"Product order quantity: {orderLine.Quantity}");
-                    Console.WriteLine($"Product name: {product.Name}");
-                    Console.WriteLine($"Product GTIN: {orderLine.Gtin}");
-                    Console.WriteLine($"Product stock: {product.Stock}");
+                    Console.WriteLine($"Product name: {name}");
+                    Console.WriteLine($"Product sold quantity: {sold}");
+                    Console.WriteLine($"Product GTIN: {gtin}");
                     Console.WriteLine();
                 }
                 catch (Exception ex)
@@ -122,12 +128,10 @@ namespace ChannelEngineTestClient.ConsoleApp
             }
         }
 
-        private static async Task UpdateStockAsync(IProductsService productsService, string merchantProductNo)
+        private static async Task UpdateStockAsync(IProductsService productsService, string merchantProductNo, int stock)
         {
             try
             {
-                var stock = 25;
-
                 await productsService.UpdateStockAsync(merchantProductNo, stock);
 
                 var product = await productsService.GetProductAsync(merchantProductNo);

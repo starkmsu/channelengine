@@ -1,8 +1,44 @@
-﻿@{
+﻿@model IndexModel
+@{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    <a>Product name</a>
+                </th>
+                <th>
+                    <a>Sold quantity</a>
+                </th>
+                <th>
+                    <a>GTIN</a>
+                </th>
+                <th>
+                    <a>Update stock</a>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.TopOrders)
+            {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Sold)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.GTIN)
+                </td>
+                <td>
+                    @Html.ActionLink("Update stock to 25", "UpdateStock", "Home", new { productNo = item.ProductNo })
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
 </div>

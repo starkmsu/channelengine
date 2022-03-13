@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -46,6 +48,34 @@ namespace ChannelEngineTestClient.Services
 
                 var productData = JsonConvert.DeserializeObject<ItemApiResponse<Product>>(content);
                 return productData.Content;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+
+                throw;
+            }
+        }
+
+        public async Task<List<Product>> GetProductsAsync(IEnumerable<string> merchantProductNos, CancellationToken cancellationTokem = default)
+        {
+            var url = $"{_baseUrl}/v2/products?apikey={_apiKey}";
+            foreach (var merchantProductNo in merchantProductNos)
+            {
+                url += $"&merchantProductNoList={merchantProductNo}";
+            }
+            try
+            {
+                var response = await _httpClient.GetAsync(url, cancellationTokem);
+                var content = await response.Content.ReadAsStringAsync();
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogError(content);
+                    throw new InvalidOperationException($"Failed to fethc orders ({response.StatusCode}: {content})");
+                }
+
+                var productsData = JsonConvert.DeserializeObject<CollectionApiResponse<Product>>(content);
+                return productsData.Content.ToList();
             }
             catch (Exception ex)
             {
